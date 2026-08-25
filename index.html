@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>leo</title>
+    <style>
+        table {border-collapse :collapse;margin-bottom: 30px;}
+        th,td {border: 1px solid #ccc ; padding: 8px 12px; text-align: left;}
+        th{background: #f0f0f0 ;}
+    </style>
+</head>
+<body>
+    <h1>Autor</h1>
+    <table id="tabela-carro">   
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>cor</th>
+                <th>modelo</th>
+                <th>ano</th>
+            </tr>
+            <tbody></tbody>
+        </thead>
+    </table>
+    <script>
+        const API_URL = "http://localhost:8000" 
+        async function  carregarCarro(){
+            const resposta = await fetch(`${API_URL}/carro`);
+            const dados = await resposta.json();
+
+            const corpo = document.querySelector("#tabela-carro tbody")
+            dados.innerHTML ="";
+            
+            for(let i = 0; i < dados.length; i++){
+                const carro = dados[i];
+            
+           
+
+                corpo.insertAdjacentHTML ("beforeend",
+                 `<tr>
+                    <td>${carro.id}</td>
+                    <td>${carro.cor}</td>
+                    <td>${carro.modelo}</td>
+                    <td>${carro.ano}</td>
+                    </tr>`);
+                }
+            }
+        carregarCarro()
+    </script>
+</body>
+
+
+</html>
