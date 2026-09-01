@@ -1,0 +1,172 @@
+<!-- aula 13/08/2026!
+exemplo basico de html para estudos!!!!!!-->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Carros</title>
+
+    <style>
+        input#Cor,
+        input#Modelo {
+            text-transform: capitalize;
+            color: #999999;
+        }
+
+        input#DataFabricacao::-webkit-datetime-edit {
+            color: #999999;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        button.excluir {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button.excluir:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Cadastro de Carros</h1>
+
+    <input
+        id="Cor"
+        type="text"
+        placeholder="Cor"
+    >
+
+    <input
+        id="Modelo"
+        type="text"
+        placeholder="Modelo"
+    >
+
+    <input
+        id="DataFabricacao"
+        type="date"
+    >
+
+    <button onclick="salvar()">
+        Salvar
+    </button>
+
+    <h2>Carros Cadastrados</h2>
+
+    <table id="tabela-carro">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Cor</th>
+                <th>Modelo</th>
+                <th>Data de Fabricação</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+</div>
+
+<script>
+    const API_URL = "http://localhost:8000";
+
+    async function salvar(){
+        const cor = document.querySelector("#Cor").value;
+        const modelo = document.querySelector("#Modelo").value;
+        const data_fabricacao = document.querySelector("#DataFabricacao").value;
+
+        const resposta = await fetch(`${API_URL}/carro`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                cor: cor,
+                modelo: modelo,
+                data_fabricacao: data_fabricacao
+            })
+        });
+
+        if(resposta.ok){
+            alert("Carro cadastrado com sucesso!");
+            document.querySelector("#Cor").value = "";
+            document.querySelector("#Modelo").value = "";
+            document.querySelector("#DataFabricacao").value = "";
+            carregarCarro();
+        } else {
+            const erro = await resposta.json();
+            alert("Erro ao cadastrar: " + JSON.stringify(erro));
+        }
+    }
+
+    async function excluir(id){
+        const confirmar = confirm(`Deseja realmente excluir o carro de id ${id}?`);
+        if(!confirmar) return;
+
+        const resposta = await fetch(`${API_URL}/carro/${id}`, {
+            method: "DELETE"
+        });
+
+        const dados = await resposta.json();
+
+        if(resposta.ok){
+            alert(dados.mensagem);
+            carregarCarro();
+        } else {
+            alert("Erro ao excluir: " + JSON.stringify(dados));
+        }
+    }
+
+    async function carregarCarro(){
+        const resposta = await fetch(`${API_URL}/carro`);
+        const dados = await resposta.json();
+
+        const corpo = document.querySelector("#tabela-carro tbody");
+        corpo.innerHTML = "";
+
+        for(let i = 0; i < dados.length; i++){
+            const carro = dados[i];
+
+            corpo.insertAdjacentHTML("beforeend", `
+                <tr>
+                    <td>${carro.id}</td>
+                    <td>${carro.cor}</td>
+                    <td>${carro.modelo}</td>
+                    <td>${carro.data_fabricacao}</td>
+                    <td><button class="excluir" onclick="excluir(${carro.id})">Excluir</button></td>
+                </tr>
+            `);
+        }
+    }
+
+    carregarCarro();
+</script>
+
+</body>
+
+</html>

@@ -1,11 +1,10 @@
-from sqlalchemy import Column,String,Integer
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String, Date
+from database import Base
 
-base = declarative_base()
-
-class Carro (base):
+class Carro(Base):
     __tablename__ = "carro"
-    id = Column (Integer,primary_key=True, index = True)
-    cor = Column(String(50),nullable=False)
-    modelo = Column (String(50), nullable=False)
-    ano = Column(Integer, nullable=False)
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    cor = Column(String(50))
+    modelo = Column(String(50))
+    data_fabricacao = Column(Date)
